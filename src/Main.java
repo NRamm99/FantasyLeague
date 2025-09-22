@@ -27,7 +27,8 @@ public class Main {
             playerScores[n] = getRandomScore();
 
         }
-        printTeam(playerNames, playerScores, input);
+        printTeam(playerNames, playerScores);
+        waitForUser(input);
         return playerCount;
     }
 
@@ -41,15 +42,16 @@ public class Main {
         }
     }
 
-    public static void printTeam(String[] playerNames, int[] playerScores, Scanner input) {
+    public static void printTeam(String[] playerNames, int[] playerScores) {
         clearConsole();
+        int i = 0;
         System.out.println("---------- YOUR TEAM ----------");
         for (int n = 0; n < playerNames.length; n++) {
             if (playerNames[n] != null && !playerNames[n].isEmpty()) {
-                System.out.println((n + 1) + ": " + playerNames[n] + " |  Rating: " + playerScores[n]);
+                i++;
+                System.out.println((i) + ": " + playerNames[n] + " |  Rating: " + playerScores[n]);
             }
         }
-        waitForUser(input);
 
     }
 
@@ -77,19 +79,21 @@ public class Main {
 
             switch (userInput) {
                 case 1:
-                    addPlayer(playerNames, playerScores, input, playerCount);
+                    playerCount = addPlayer(playerNames, playerScores, input, playerCount);
                     break;
                 case 2:
-
+                    playerCount = removePlayer(playerNames, playerScores, playerCount, input);
                     break;
                 case 3:
-
+                    editPlayer(playerNames, playerScores, input);
                     break;
                 case 4:
 
                     break;
                 case 5:
-                    printTeam(playerNames, playerScores, input);
+                    input.nextLine();
+                    printTeam(playerNames, playerScores);
+                    waitForUser(input);
                     break;
                 case 6:
                     break;
@@ -98,7 +102,7 @@ public class Main {
     }
 
 
-    public static void addPlayer(String[] playerNames, int[] playerScores, Scanner input, int playerCount) {
+    public static int addPlayer(String[] playerNames, int[] playerScores, Scanner input, int playerCount) {
         if (playerCount < 11) {
             for (int n = 0; n < playerNames.length; n++) {
                 if (playerNames[n] == null || playerNames[n].isEmpty()) {
@@ -114,11 +118,45 @@ public class Main {
         } else {
             System.out.println("Holdet er fuldt. Du kan ikke tilføje flere spillere.");
         }
+        return playerCount;
     }
 
     public static void waitForUser(Scanner input) {
         System.out.println("Tryk enter for at fortsætte...");
         input.nextLine();
+    }
+
+    public static int removePlayer(String[] playerNames, int[] playerScores, int playerCount, Scanner input) {
+        printTeam(playerNames, playerScores);
+        System.out.println();
+        System.out.print("Jeg vil gerne fjerne ");
+        input.nextLine();
+        String userInput = input.nextLine();
+
+        for (int n = 0; n <= playerNames.length - 1; n++) {
+            if (userInput.equalsIgnoreCase(playerNames[n])) {
+                playerNames[n] = null;
+                playerScores[n] = 0;
+                playerCount--;
+            }
+        }
+        return playerCount;
+    }
+
+    public static void editPlayer(String[] playerNames, int[] playerScores, Scanner input) {
+        printTeam(playerNames, playerScores);
+        System.out.println();
+        System.out.print("Jeg vil gerne redigere ");
+        input.nextLine();
+        String userInput = input.nextLine();
+
+        for (int n = 0; n <= playerNames.length - 1; n++) {
+            if (userInput.equalsIgnoreCase(playerNames[n])) {
+                System.out.println("Hvilken score skal " + playerNames[n] + " have?");
+                System.out.print("Score: ");
+                playerScores[n] = input.nextInt();
+            }
+        }
     }
 
 }
