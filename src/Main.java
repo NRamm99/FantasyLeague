@@ -44,15 +44,14 @@ public class Main {
 
     public static void printTeam(String[] playerNames, int[] playerScores) {
         clearConsole();
-        int i = 0;
+        int fakeIndex = 0;
         System.out.println("---------- YOUR TEAM ----------");
         for (int n = 0; n < playerNames.length; n++) {
             if (playerNames[n] != null && !playerNames[n].isEmpty()) {
-                i++;
-                System.out.println((i) + ": " + playerNames[n] + " |  Rating: " + playerScores[n]);
+                fakeIndex++;
+                System.out.println((fakeIndex) + ": " + playerNames[n] + " |  Rating: " + playerScores[n]);
             }
         }
-
     }
 
     public static void menuController(Scanner input, String[] playerNames, int[] playerScores, int playerCount) {
@@ -60,22 +59,24 @@ public class Main {
         do {
 
             do {
+                clearConsole();
                 System.out.println("""
                         ---------- MENU ----------
                         1... Opret spiller
                         2... Fjern spiller
                         3... Rediger spiller
-                        4... Se højeste rated spiller
-                        5... Vis hold
-                        6... Afslut
+                        4... Erstat spiller
+                        5... Team stats
+                        6... Vis hold
+                        7... Afslut
                         --------------------------
                         """);
                 userInput = input.nextInt();
 
-                if ((userInput < 1) || (userInput > 6)) {
+                if ((userInput < 1) || (userInput > 7)) {
                     System.out.println("Ugyldigt input. (Indtast tal mellem 1-5)");
                 }
-            } while ((userInput < 1) || (userInput > 6));
+            } while ((userInput < 1) || (userInput > 7));
 
             switch (userInput) {
                 case 1:
@@ -88,14 +89,19 @@ public class Main {
                     editPlayer(playerNames, playerScores, input);
                     break;
                 case 4:
-
+                    replacePlayer(playerNames, playerScores, input);
                     break;
                 case 5:
+                    teamReport(playerNames, playerScores);
+                    input.nextLine();
+                    waitForUser(input);
+                    break;
+                case 6:
                     input.nextLine();
                     printTeam(playerNames, playerScores);
                     waitForUser(input);
                     break;
-                case 6:
+                case 7:
                     break;
             }
         } while (userInput != 6);
@@ -157,6 +163,86 @@ public class Main {
                 playerScores[n] = input.nextInt();
             }
         }
+    }
+
+    public static void replacePlayer(String[] playerNames, int[] playerScores, Scanner input) {
+        printTeam(playerNames, playerScores);
+        System.out.println();
+        System.out.print("Jeg vil gerne erstatte ");
+        input.nextLine();
+        String userInput = input.nextLine();
+
+        for (int n = 0; n <= playerNames.length - 1; n++) {
+            if (userInput.equalsIgnoreCase(playerNames[n])) {
+                System.out.println("Hvem skal " + playerNames[n] + " erstattes med?");
+                System.out.print("Navn: ");
+                playerNames[n] = input.nextLine();
+
+                System.out.println("Hvilken score skal " + playerNames[n] + " have?");
+                System.out.print("Score: ");
+                playerScores[n] = input.nextInt();
+            }
+        }
+    }
+
+    public static void teamReport(String[] playerNames, int[] playerScores) {
+
+
+        printBestPlayer(playerNames, playerScores);
+        printWorstPlayer(playerNames, playerScores);
+        printAverageScore(playerNames, playerScores);
+    }
+
+    public static void printBestPlayer(String[] playerNames, int[] playerScores) {
+        int highScore = Integer.MIN_VALUE;
+        int bestPlayerIndex = 0;
+        for (int n = 0; n <= playerNames.length - 1; n++) {
+            if ((playerNames[n] != null) && playerScores[n] > highScore) {
+                highScore = playerScores[n];
+                bestPlayerIndex = n;
+            }
+        }
+        printToConsole("------------ DIN BEDSTE SPILLER -------------\n" + playerNames[bestPlayerIndex] + " || Score: " + playerScores[bestPlayerIndex] + "\n");
+    }
+
+    public static void printWorstPlayer(String[] playerNames, int[] playerScores) {
+        int lowestScore = Integer.MAX_VALUE;
+        int bestPlayerIndex = 0;
+        for (int n = 0; n <= playerNames.length - 1; n++) {
+            if ((playerNames[n] != null) && playerScores[n] < lowestScore) {
+                lowestScore = playerScores[n];
+                bestPlayerIndex = n;
+            }
+        }
+        printToConsole("---------- DIN LAVES RATED SPILLER ----------\n" + playerNames[bestPlayerIndex] + " || Score: " + playerScores[bestPlayerIndex] + "\n", false);
+    }
+
+    public static void printAverageScore(String[] playerNames, int[] playerScores) {
+        int sum = 0;
+        int playerCount = 0;
+        int averageScore;
+
+        for (int n = 0; n <= playerNames.length - 1; n++) {
+            if (playerNames[n] != null) {
+                sum += playerScores[n];
+                playerCount++;
+            }
+        }
+        averageScore = sum / playerCount;
+
+        printToConsole("--------------------------------------------- \nDit holds gennemsnitlige score: " + averageScore + "\n\n\n", false);
+
+    }
+
+    public static void printToConsole(String text, boolean clear) {
+        if (clear) {
+            clearConsole();
+        }
+        System.out.println(text);
+    }
+
+    public static void printToConsole(String text) {
+        printToConsole(text, true);
     }
 
 }
