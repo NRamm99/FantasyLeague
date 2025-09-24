@@ -14,11 +14,36 @@ public class Main {
     }
 
     public static int createTeam(Scanner input, String[] playerNames, int[] playerScores) {
-
         clearConsole();
-        System.out.println("Hvor mange spillere vil du indtaste?");
-        int playerCount = input.nextInt();
-        input.nextLine();
+        System.out.println("""
+        ##################################################
+                  Velkommen til Fantasy Football        \s
+        ##################################################
+       \s""");
+
+        int playerCount = -1;
+        boolean validInput = false;
+
+        while (!validInput) {
+            System.out.print("Hvor mange spillere vil starte med indtaste?: ");
+
+            if (input.hasNextInt()) {
+                playerCount = input.nextInt();
+                input.nextLine(); //Ryder
+
+                if (playerCount >= 1 && playerCount <= 11) {
+                    validInput = true;
+
+                } else {
+                    System.out.println("\nDu skal indtaste et tal mellem 1-11");
+                }
+            } else {
+
+                System.out.println("\nUgyldigt input. Du skal indtaste et tal");
+                input.nextLine(); //Ryder
+            }
+        }
+
 
         for (int n = 0; n <= playerCount - 1; n++) {
             clearConsole();
@@ -55,10 +80,12 @@ public class Main {
     }
 
     public static void menuController(Scanner input, String[] playerNames, int[] playerScores, int playerCount) {
-        int userInput;
-        do {
+        int userInput = -1;
 
-            do {
+        do {
+            boolean validInput = false;
+
+            while (!validInput) {
                 clearConsole();
                 System.out.println("""
                         ---------- MENU ----------
@@ -71,12 +98,23 @@ public class Main {
                         7... Afslut
                         --------------------------
                         """);
-                userInput = input.nextInt();
+                if (input.hasNextInt()) {
+                    userInput = input.nextInt();
+                    input.nextLine(); // Rydder
 
-                if ((userInput < 1) || (userInput > 7)) {
-                    System.out.println("Ugyldigt input. (Indtast tal mellem 1-5)");
+                    if (userInput >= 1 && userInput <= 7) {
+                        validInput = true;
+
+                    } else {
+                        System.out.println("Ugyldigt valgt. Indtast et tal mellem 1 og 7");
+                        waitForUser(input);
+                    }
+                } else {
+                    System.out.println("Du skal indtaste et tal");
+                    input.nextLine(); // Rydder
+                    waitForUser(input);
                 }
-            } while ((userInput < 1) || (userInput > 7));
+            }
 
             switch (userInput) {
                 case 1:
@@ -93,18 +131,16 @@ public class Main {
                     break;
                 case 5:
                     teamReport(playerNames, playerScores);
-                    input.nextLine();
                     waitForUser(input);
                     break;
                 case 6:
-                    input.nextLine();
                     printTeam(playerNames, playerScores);
                     waitForUser(input);
                     break;
                 case 7:
                     break;
             }
-        } while (userInput != 6);
+        } while (userInput != 7);
     }
 
 
@@ -136,7 +172,6 @@ public class Main {
         printTeam(playerNames, playerScores);
         System.out.println();
         System.out.print("Jeg vil gerne fjerne ");
-        input.nextLine();
         String userInput = input.nextLine();
 
         for (int n = 0; n <= playerNames.length - 1; n++) {
@@ -153,15 +188,46 @@ public class Main {
         printTeam(playerNames, playerScores);
         System.out.println();
         System.out.print("Jeg vil gerne redigere ");
-        input.nextLine();
         String userInput = input.nextLine();
+
+        boolean found = false;
 
         for (int n = 0; n <= playerNames.length - 1; n++) {
             if (userInput.equalsIgnoreCase(playerNames[n])) {
-                System.out.println("Hvilken score skal " + playerNames[n] + " have?");
-                System.out.print("Score: ");
-                playerScores[n] = input.nextInt();
+                found = true;
+                int newRating = -1;
+                boolean validRating = false;
+
+                while (!validRating) {
+
+                    System.out.println("Hvilken Rating skal " + playerNames[n] + " have?");
+                    System.out.print("Rating: ");
+
+                    if (input.hasNext()) {
+                        newRating = input.nextInt();
+                        input.nextLine(); // Rydder
+
+                        if (newRating >= 0 && newRating <= 100) {
+                            validRating = true;
+                        } else {
+                            System.out.println("Den nye Rating må kun være mellem 0-100");
+                        }
+                    } else {
+                        System.out.println(" Du skal indstaste et heltal");
+                        input.nextLine(); // Rydder
+                    }
+                }
+
+                playerScores[n] = newRating;
+                System.out.println("Spillerens nye Rating");
+                waitForUser(input);
+                break;
             }
+        }
+
+        if (!found) {
+            System.out.println("Du har ingen spillere på holdet med det navn");
+            waitForUser(input);
         }
     }
 
@@ -169,24 +235,53 @@ public class Main {
         printTeam(playerNames, playerScores);
         System.out.println();
         System.out.print("Jeg vil gerne erstatte ");
-        input.nextLine();
         String userInput = input.nextLine();
+
+        boolean found = false;
 
         for (int n = 0; n <= playerNames.length - 1; n++) {
             if (userInput.equalsIgnoreCase(playerNames[n])) {
+                found = true;
+
                 System.out.println("Hvem skal " + playerNames[n] + " erstattes med?");
                 System.out.print("Navn: ");
-                playerNames[n] = input.nextLine();
+                String newName = input.nextLine();
 
-                System.out.println("Hvilken score skal " + playerNames[n] + " have?");
-                System.out.print("Score: ");
-                playerScores[n] = input.nextInt();
+                int newRating = -1;
+                boolean validRating = false;
+
+                while (!validRating) {
+                    System.out.println("Hvilken rating skal " + newName + " have?");
+                    System.out.print("Rating: ");
+
+                    if (input.hasNextInt()) {
+                        newRating = input.nextInt();
+                        input.nextLine(); // Rydder
+
+                        if (newRating >= 0 && newRating <= 100) {
+                            validRating = true;
+                        } else {
+                            System.out.println("\nDen nye Rating skal være mellem 0-100");
+                        }
+                    } else {
+                        System.out.println("\nUgyldigt input. Du skal skrive et heltal");
+                        input.nextLine(); //Rydder
+                    }
+                }
+                playerNames[n] = newName;
+                playerScores[n] = newRating;
+                System.out.println("Spilleren er blevet erstattet");
+                waitForUser(input);
+                break;
             }
+        }
+        if (!found){
+            System.out.println("Ingen spiller med navnet " + userInput + "blev fundet");
+            waitForUser(input);
         }
     }
 
     public static void teamReport(String[] playerNames, int[] playerScores) {
-
 
         printBestPlayer(playerNames, playerScores);
         printWorstPlayer(playerNames, playerScores);
